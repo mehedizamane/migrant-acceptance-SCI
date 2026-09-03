@@ -17,7 +17,7 @@ replace iso2 = "GR" if isocntry == "EL"
 
 
 *merge SCI 
-merge m:1 iso2  using "global_sci_final_neil_2020.dta"
+merge m:1 iso2  using "global_sci_final_2026.dta"
 
 *drop countries not in eurobarometer 
 drop if _merge==2 
