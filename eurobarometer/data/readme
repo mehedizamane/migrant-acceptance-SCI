@@ -1,1 +1,2 @@
-
+wdi_indicators was downloaded directly from the World Bank website at https://databank.worldbank.org/source/world-development-indicators. 2006-2026 Data of the relevant variables (e.g. GDP per capita, total population, population using internet) were downloaded but only 2021 data were merged to the Eurobarometer dataset in the analysis. 
+ZA7847_v1-0-0.dta was downloaded directly from the GESIS at https://search.gesis.org/research_data/ZA7847?doi=10.4232/1.14063. 
