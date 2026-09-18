@@ -39,6 +39,8 @@ levelsof country_id if e(sample), local(countries)
 local ncountry : word count `countries'
 estadd scalar Countries = `ncountry'
 
+local p_manager = 2*normal(-abs(_b[z_country_sci]/_se[z_country_sci]))
+
 eststo m2
 
 
@@ -59,6 +61,7 @@ estadd scalar ICC_country = r(icc2)
 levelsof country_id if e(sample), local(countries)
 local ncountry : word count `countries'
 estadd scalar Countries = `ncountry'
+local p_colleague = 2*normal(-abs(_b[z_country_sci]/_se[z_country_sci]))
 
 eststo m3
 
@@ -80,6 +83,7 @@ estadd scalar ICC_country = r(icc2)
 levelsof country_id if e(sample), local(countries)
 local ncountry : word count `countries'
 estadd scalar Countries = `ncountry'
+local p_neighbour = 2*normal(-abs(_b[z_country_sci]/_se[z_country_sci]))
 
 eststo m4
 
@@ -101,6 +105,7 @@ estadd scalar ICC_country = r(icc2)
 levelsof country_id if e(sample), local(countries)
 local ncountry : word count `countries'
 estadd scalar Countries = `ncountry'
+local p_doctor = 2*normal(-abs(_b[z_country_sci]/_se[z_country_sci]))
 
 eststo m5
 
@@ -122,6 +127,7 @@ estadd scalar ICC_country = r(icc2)
 levelsof country_id if e(sample), local(countries)
 local ncountry : word count `countries'
 estadd scalar Countries = `ncountry'
+local p_family = 2*normal(-abs(_b[z_country_sci]/_se[z_country_sci]))
 
 eststo m6
 
@@ -143,10 +149,57 @@ estadd scalar ICC_country = r(icc2)
 levelsof country_id if e(sample), local(countries)
 local ncountry : word count `countries'
 estadd scalar Countries = `ncountry'
+local p_friends = 2*normal(-abs(_b[z_country_sci]/_se[z_country_sci]))
 
 eststo m7
 
 
+*============================================================*
+* Holm adjustment
+*============================================================*
+
+preserve
+
+clear
+set obs 6
+
+gen outcome = ""
+gen p_unadjusted = .
+gen order = _n
+
+replace outcome = "Manager"   in 1
+replace outcome = "Colleague" in 2
+replace outcome = "Neighbour" in 3
+replace outcome = "Doctor"    in 4
+replace outcome = "Family"    in 5
+replace outcome = "Friends"   in 6
+
+replace p_unadjusted = `p_manager'   in 1
+replace p_unadjusted = `p_colleague' in 2
+replace p_unadjusted = `p_neighbour' in 3
+replace p_unadjusted = `p_doctor'    in 4
+replace p_unadjusted = `p_family'    in 5
+replace p_unadjusted = `p_friends'   in 6
+
+* Sort p-values from smallest to largest
+sort p_unadjusted
+
+gen rank = _n
+gen p_holm = p_unadjusted * (6 - rank + 1)
+
+* Holm adjusted p-values must be monotonic
+forvalues i = 2/6 {
+    replace p_holm = max(p_holm, p_holm[_n-1]) if _n == `i'
+}
+
+* Cap at 1
+replace p_holm = min(p_holm, 1)
+
+sort outcome
+
+list outcome p_unadjusted p_holm, noobs sep(0)
+
+restore
 
 *------------------------------------------------------------
 * Export table
